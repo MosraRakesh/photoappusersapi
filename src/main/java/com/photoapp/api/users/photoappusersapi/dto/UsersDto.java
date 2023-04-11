@@ -1,5 +1,9 @@
 package com.photoapp.api.users.photoappusersapi.dto;
 
+import java.util.List;
+
+import com.photoapp.api.users.photoappusersapi.ui.response.model.AlbumResponseModel;
+
 public class UsersDto {
 	private String userId;
 	private String firstName;
@@ -7,6 +11,7 @@ public class UsersDto {
 	private String emailId;
 	private String password;
 	private String encryptedPassword;
+	private List<AlbumResponseModel> albums;
 
 	public String getUserId() {
 		return userId;
@@ -56,6 +61,14 @@ public class UsersDto {
 
 	public void setEncryptedPassword(String encryptedPassword) {
 		this.encryptedPassword = encryptedPassword;
+	}
+
+	public List<AlbumResponseModel> getAlbums() {
+		return albums;
+	}
+
+	public void setAlbums(List<AlbumResponseModel> albums) {
+		this.albums = albums;
 	}
 
 }

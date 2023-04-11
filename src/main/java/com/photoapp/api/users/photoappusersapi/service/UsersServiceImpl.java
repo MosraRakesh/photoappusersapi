@@ -1,10 +1,13 @@
 package com.photoapp.api.users.photoappusersapi.service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,9 +15,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.photoapp.api.users.photoappusersapi.data.AlbumsFiegnClient;
 import com.photoapp.api.users.photoappusersapi.data.UsersEntity;
 import com.photoapp.api.users.photoappusersapi.data.UsersRepository;
 import com.photoapp.api.users.photoappusersapi.dto.UsersDto;
+import com.photoapp.api.users.photoappusersapi.ui.response.model.AlbumResponseModel;
+
+import feign.FeignException;
 
 @Service
 public class UsersServiceImpl implements UsersService {
@@ -23,11 +30,17 @@ public class UsersServiceImpl implements UsersService {
 	
 	BCryptPasswordEncoder bcryptPasswordEncoder;
 	
+	AlbumsFiegnClient albumsFiegnClient;
+	
+	Logger logger=LoggerFactory.getLogger(this.getClass());
+	
 	
 	@Autowired
-	public UsersServiceImpl(UsersRepository usersRepository,BCryptPasswordEncoder bcryptPasswordEncoder) {
+	public UsersServiceImpl(UsersRepository usersRepository,BCryptPasswordEncoder bcryptPasswordEncoder,
+			AlbumsFiegnClient albumsFiegnClient) {
 		this.usersRepository=usersRepository;
 		this.bcryptPasswordEncoder=bcryptPasswordEncoder;
+		this.albumsFiegnClient=albumsFiegnClient;
 	}
 
 	@Override
@@ -59,6 +72,23 @@ public class UsersServiceImpl implements UsersService {
 		if(userEntity == null) throw new UsernameNotFoundException(emailId);
 		
 		return new ModelMapper().map(userEntity, UsersDto.class);
+	}
+
+	@Override
+	public UsersDto getUserDetailsById(String userId) {
+		UsersEntity userEntity=usersRepository.findByUserId(userId);
+		ModelMapper modelMap=new ModelMapper();
+		if(userEntity == null) throw new UsernameNotFoundException(userId);
+		UsersDto userDto= modelMap.map(userEntity, UsersDto.class);
+		
+		try {
+		List<AlbumResponseModel> aibums=albumsFiegnClient.getAlbums(userId);
+		userDto.setAlbums(aibums);
+		}catch(FeignException e) {
+			logger.info(e.getLocalizedMessage());
+		}
+		return userDto;
+		
 	}
 
 }

@@ -1,7 +1,5 @@
 package com.photoapp.api.users.photoappusersapi.security;
 
-import javax.servlet.Filter;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
