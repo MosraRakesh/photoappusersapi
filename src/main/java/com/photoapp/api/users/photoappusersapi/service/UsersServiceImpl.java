@@ -81,12 +81,12 @@ public class UsersServiceImpl implements UsersService {
 		if(userEntity == null) throw new UsernameNotFoundException(userId);
 		UsersDto userDto= modelMap.map(userEntity, UsersDto.class);
 		
-		try {
+		/*try {*/
 		List<AlbumResponseModel> aibums=albumsFiegnClient.getAlbums(userId);
 		userDto.setAlbums(aibums);
-		}catch(FeignException e) {
+	/*	}catch(FeignException e) {
 			logger.info(e.getLocalizedMessage());
-		}
+		}*/
 		return userDto;
 		
 	}
